@@ -50,8 +50,6 @@ class pca:
 def main():
 
     # Step 1: Load the data dictionary
-
-
     with open('../humact.json', 'r') as f:
         data_dict = json.load(f)
 
@@ -60,13 +58,11 @@ def main():
     activity_ids = np.array(data_dict['actid'])
     activity_names = data_dict['actnames']
 
-
     # Step 2: Perform PCA analysis
     p = pca(features)
 
     # Project data onto PCA space
     features_pca = p.project(features)
-
 
     # Step 3: Create scatter plot with different colors/symbols for each activity
     colors = ['red', 'green', 'blue', 'orange', 'purple']
@@ -74,13 +70,11 @@ def main():
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
-
     unique_activities = np.unique(activity_ids)
     for i, act_id in enumerate(unique_activities):
         # Find samples belonging to this activity
         mask = activity_ids == act_id
         activity_data = features_pca[mask]
-
 
         ax.scatter(activity_data[:, 0], activity_data[:, 1],
                    color=colors[i % len(colors)],
@@ -97,7 +91,6 @@ def main():
     plt.show()
 
     # Step 4: Compute correlation coefficients
-
     # Correlation between raw features 0 and 1
     rho_raw = np.corrcoef(features[:, 0], features[:, 1])[0, 1]
     print(f"Correlation between raw feature 0 and 1: ρ = {rho_raw:.6f}")
@@ -105,12 +98,7 @@ def main():
     # Correlation between PCA features 0 and 1
     rho_pca = np.corrcoef(features_pca[:, 0], features_pca[:, 1])[0, 1]
     print(f"Correlation between PCA feature 0 and 1: ρ = {rho_pca:.6f}")
-
-
     print(f"\nThe correlation between the first two PCA features is {rho_pca:.6f}")
-    print("This value is expected because PCA finds orthogonal directions of maximum variance and "
-          "orthogonal vectors are uncorrelated by definition")
-    print()
 
     # Step 5: Use the num_effective_dims function
     n_dims = p.num_effective_dims(99.9)
