@@ -51,37 +51,21 @@ def main():
 
     # Step 1: Load the data dictionary
 
-    try:
-        with open('../humact.json', 'r') as f:
-            data_dict = json.load(f)
 
-        # Extract the components we need
-        features = np.array(data_dict['feat'])
-        activity_ids = np.array(data_dict['actid'])
-        activity_names = data_dict['actnames']
+    with open('../humact.json', 'r') as f:
+        data_dict = json.load(f)
 
-    except FileNotFoundError:
-        print("Error: humact.json file not found.")
-        return
-    except Exception as e:
-        print(f"Error loading data: {e}")
-        return
+    # Extract the components we need
+    features = np.array(data_dict['feat'])
+    activity_ids = np.array(data_dict['actid'])
+    activity_names = data_dict['actnames']
+
 
     # Step 2: Perform PCA analysis
     p = pca(features)
 
     # Project data onto PCA space
     features_pca = p.project(features)
-
-    # Display eigenvalue information
-    print("Eigenvalues (variance in each PCA dimension):")
-    total_var = np.sum(p.evals)
-    for i in range(min(10, len(p.evals))):  # Show first 10
-        percent = (p.evals[i] / total_var) * 100
-        print(f"  PC{i + 1}: {p.evals[i]:.4f} ({percent:.1f}%)")
-
-    # Calculate cumulative variance for first few components
-    cumulative_var = np.cumsum(p.evals) / total_var * 100
 
 
     # Step 3: Create scatter plot with different colors/symbols for each activity
@@ -90,7 +74,7 @@ def main():
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
-    # Plot each activity with unique color and marker
+
     unique_activities = np.unique(activity_ids)
     for i, act_id in enumerate(unique_activities):
         # Find samples belonging to this activity
@@ -122,15 +106,13 @@ def main():
     rho_pca = np.corrcoef(features_pca[:, 0], features_pca[:, 1])[0, 1]
     print(f"Correlation between PCA feature 0 and 1: ρ = {rho_pca:.6f}")
 
-    print(f"\nExplanation of PCA correlation:")
-    print(f"The correlation between the first two PCA features is {rho_pca:.6f}")
+
+    print(f"\nThe correlation between the first two PCA features is {rho_pca:.6f}")
     print("This value is expected because PCA finds orthogonal directions of maximum variance and "
           "orthogonal vectors are uncorrelated by definition")
     print()
 
     # Step 5: Use the num_effective_dims function
-
-    # Test the function for 99.9% variance
     n_dims = p.num_effective_dims(99.9)
     print(f"Number of dimensions needed for 99.9% variance: {n_dims}")
 
